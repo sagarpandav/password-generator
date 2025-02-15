@@ -1,0 +1,30 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <!-- Main fortress structure -->
+    <rect x="100" y="100" width="200" height="150" fill="#e5e7eb"/>
+
+    <!-- Towers -->
+    <rect x="80" y="80" width="40" height="170" fill="#d1d5db"/>
+    <rect x="280" y="80" width="40" height="170" fill="#d1d5db"/>
+
+    <!-- Tower tops -->
+    <path d="M70 80 L100 60 L130 80" fill="#9ca3af"/>
+    <path d="M270 80 L300 60 L330 80" fill="#9ca3af"/>
+
+    <!-- Door -->
+    <rect x="175" y="170" width="50" height="80" fill="#4b5563"/>
+    <circle cx="190" cy="210" r="3" fill="#gold"/>
+
+    <!-- Windows -->
+    <rect x="140" y="120" width="20" height="30" fill="#60a5fa"/>
+    <rect x="240" y="120" width="20" height="30" fill="#60a5fa"/>
+
+    <!-- Flag -->
+    <rect x="295" y="40" width="2" height="40" fill="#4b5563"/>
+    <path d="M297 40 L317 50 L297 60" fill="#ef4444"/>
+
+    <!-- Clouds -->
+    <circle cx="50" cy="50" r="20" fill="#f3f4f6"/>
+    <circle cx="70" cy="50" r="15" fill="#f3f4f6"/>
+    <circle cx="330" cy="70" r="25" fill="#f3f4f6"/>
+    <circle cx="350" cy="70" r="20" fill="#f3f4f6"/>
+</svg>

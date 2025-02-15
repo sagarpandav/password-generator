@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Password Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-90 shadow-md border-b border-blue-100">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-xl font-semibold text-gray-700">Password Generator</div>
+                <div class="space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-gray-800">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-800">About</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-800">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12 max-w-5xl">
+        <h1 class="text-5xl font-bold text-center mb-4 bg-gradient-to-r bg-clip-text">Random Password Generator</h1>
+        <p class="text-center text-gray-600 mb-12 text-lg">Create strong and secure passwords to keep your account safe online.</p>
+
+        <div class="flex flex-col md:flex-row gap-12 w-full md:max-w-screen-lg">
+            <!-- Left side illustration -->
+            <div class="md:w-1/2">
+                <img src="{{ url_for('static', filename='fortress.svg') }}" alt="Security Illustration" class="w-full">
+            </div>
+
+            <!-- Right side controls -->
+            <div class="md:w-1/2">
+                <!-- <div class="bg-white rounded-lg shadow-lg p-8 border border-blue-100"> -->
+                    <!-- Password display -->
+                    <div class="flex items-center gap-3 mb-8">
+                        <input type="text" id="password" readonly
+                            class="w-full p-4 border rounded-full bg-gray-50 text-xl font-mono">
+                        <button onclick="regeneratePassword()" class="p-3 hover:bg-blue-50 rounded-full transition-colors duration-200 hover:rotate-180 transform">
+                            <i data-feather="refresh-cw"></i>
+                        </button>
+                        <button onclick="copyPassword()" class=" text-white px-6 py-3 rounded-full text-lg transition-all duration-200 bg-blue-500 hover:bg-blue-600">
+                            Copy
+                        </button>
+                    </div>
+
+                    <!-- Strength indicator -->
+                    <div id="strength-indicator" class="mb-8"></div>
+
+                    <!-- Length slider -->
+                    <div class="mb-8">
+                        <label class="block mb-3 text-lg">Password length: <span id="length-value" class="font-medium ml-1">16</span></label>
+                        <div class="flex items-center gap-3">
+                            <button onclick="decrementLength()" class="py-1 px-3.5 rounded-full border border-blue-400 hover:bg-gray-100 text-lg font-medium">-</button>
+                            <input type="range" id="length" min="8" max="32" value="16" class="w-full h-2 bg-gradient-to-r from-blue-400 to-blue-700 rounded-lg appearance-none cursor-pointer">
+                            <button onclick="incrementLength()" class="py-1 px-3 rounded-full border border-blue-700 hover:bg-gray-100 text-lg font-medium">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Character options -->
+                    <div>
+                        <label class="block mb-4 text-lg">Characters used:</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <label class="flex items-center gap-2 text-lg hover:bg-blue-50 p-2 rounded-lg transition-colors duration-200">
+                                <input type="checkbox" id="uppercase" checked class="w-5 h-5">
+                                <span>ABC</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-lg hover:bg-blue-50 p-2 rounded-lg transition-colors duration-200">
+                                <input type="checkbox" id="lowercase" checked class="w-5 h-5">
+                                <span>abc</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-lg hover:bg-blue-50 p-2 rounded-lg transition-colors duration-200">
+                                <input type="checkbox" id="numbers" checked class="w-5 h-5">
+                                <span>123</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-lg hover:bg-blue-50 p-2 rounded-lg transition-colors duration-200">
+                                <input type="checkbox" id="special" class="w-5 h-5">
+                                <span>#$&</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+
+        function updateStrengthIndicator(strength) {
+            const styles = {
+                'weak': {
+                    bg: 'bg-red-100',
+                    text: 'text-red-700',
+                },
+                'moderate': {
+                    bg: 'bg-yellow-100',
+                    text: 'text-yellow-700',
+                },
+                'strong': {
+                    bg: 'bg-green-100',
+                    text: 'text-green-700',
+                },
+                'very strong': {
+                    bg: 'bg-green-100',
+                    text: 'text-green-700',
+                }
+            };
+
+            const indicator = document.getElementById('strength-indicator');
+            const style = styles[strength];
+            indicator.innerHTML = `
+                <span class="px-4 py-2 rounded-full text-xm font-medium ${style.bg} ${style.text}">
+                    ${strength.charAt(0).toUpperCase() + strength.slice(1)}
+                </span>
+            `;
+        }
+
+        async function generatePassword() {
+            const length = document.getElementById('length').value;
+            const useUpper = document.getElementById('uppercase').checked;
+            const useLower = document.getElementById('lowercase').checked;
+            const useNumbers = document.getElementById('numbers').checked;
+            const useSpecial = document.getElementById('special').checked;
+
+            const response = await fetch('/gen-pass/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    length,
+                    useUpper,
+                    useLower,
+                    useNumbers,
+                    useSpecial
+                })
+            });
+
+            const data = await response.json();
+            document.getElementById('password').value = data.password;
+            updateStrengthIndicator(data.strength);
+        }
+
+        function regeneratePassword() {
+            generatePassword();
+        }
+
+        async function copyPassword() {
+            const password = document.getElementById('password').value;
+            await navigator.clipboard.writeText(password);
+
+            const copyButton = document.querySelector('button:last-child');
+            const originalText = copyButton.textContent;
+            copyButton.textContent = 'Copied!';
+            setTimeout(() => {
+                copyButton.textContent = originalText;
+            }, 1000);
+        }
+
+        function updateLengthValue() {
+            document.getElementById('length-value').textContent = document.getElementById('length').value;
+        }
+
+        function decrementLength() {
+            const input = document.getElementById('length');
+            if (parseInt(input.value) > parseInt(input.min)) {
+                input.value = parseInt(input.value) - 1;
+                updateLengthValue();
+                generatePassword();
+            }
+        }
+
+        function incrementLength() {
+            const input = document.getElementById('length');
+            if (parseInt(input.value) < parseInt(input.max)) {
+                input.value = parseInt(input.value) + 1;
+                updateLengthValue();
+                generatePassword();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('length').addEventListener('input', () => {
+            updateLengthValue();
+            generatePassword();
+        });
+
+        ['uppercase', 'lowercase', 'numbers', 'special'].forEach(id => {
+            document.getElementById(id).addEventListener('change', generatePassword);
+        });
+
+        // Generate initial password
+        generatePassword();
+    </script>
+</body>
+</html>
